@@ -2,7 +2,7 @@ import os
 
 import boto3
 from dotenv import load_dotenv
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template, abort
 
 load_dotenv()
 
@@ -18,15 +18,18 @@ sqs_client = boto3.client('sqs', region_name=AWS_REGION, aws_access_key_id=ACCES
 PRIORITY_QUEUES = {
     "Low": os.getenv("P1_QUEUE_URL"),
     "Medium": os.getenv("P2_QUEUE_URL"),
-    "high": os.getenv("P3_QUEUE_URL")
+    "High": os.getenv("P3_QUEUE_URL")
 }
 
 
 @priority_router.post('/')
 def priority_post():
-    title = request.form.get("titles")
-    description = request.form.get("description")
-    priority = request.form.get("priority")
+    title = request.form.get("title","Default")
+    description = request.form.get("description","Default Description")
+    priority = request.form.get("priority","Unknown")
+
+    if priority == "" or description == "" or title == "":
+        abort(400, description="One or more of your fields are empty")
 
     queue_url = PRIORITY_QUEUES[priority]
 
@@ -38,4 +41,4 @@ def priority_post():
 
     sqs_client.send_message(QueueUrl=queue_url, MessageBody=str(message_body))
 
-    return jsonify(message_body)
+    return render_template("index.html")

@@ -14,7 +14,11 @@ def handle_generic_error(error):
 
 @routes.errorhandler(400)
 def custom_error_400(msg):
-    return msg, 400
+    return {
+        "error": "Error",
+        "message": str(msg),
+        "error_type": "internal_error"
+    }, 400
 
 @routes.errorhandler(KeyError)
 def handle_key_error(error):
