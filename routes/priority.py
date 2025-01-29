@@ -2,7 +2,8 @@ import os
 
 import boto3
 from dotenv import load_dotenv
-from flask import Blueprint, request, jsonify, render_template, abort
+from flask import Blueprint, request, render_template, abort
+from pydantic import BaseModel, Field
 
 load_dotenv()
 
@@ -22,23 +23,28 @@ PRIORITY_QUEUES = {
 }
 
 
+class Request(BaseModel):
+    title: str = Field(..., min_length=1)
+    description: str = Field(..., min_length=1)
+    priority: str = Field(..., min_length=1)
+
+
 @priority_router.post('/')
 def priority_post():
-    title = request.form.get("title","Default")
-    description = request.form.get("description","Default Description")
-    priority = request.form.get("priority","Unknown")
+    title = request.form.get("title", "Default")
+    description = request.form.get("description", "Default Description")
+    priority = request.form.get("priority", "Unknown")
 
-    if priority == "" or description == "" or title == "":
-        abort(400, description="One or more of your fields are empty")
-
-    queue_url = PRIORITY_QUEUES[priority]
-
-    message_body = {
+    external_data = {
         "title": title,
         "description": description,
         "priority": priority
     }
 
-    sqs_client.send_message(QueueUrl=queue_url, MessageBody=str(message_body))
+    message = Request(**external_data)
+
+    queue_url = PRIORITY_QUEUES[priority]
+
+    sqs_client.send_message(QueueUrl=queue_url, MessageBody=message.model_dump_json())
 
     return render_template("index.html")
