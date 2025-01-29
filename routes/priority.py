@@ -28,15 +28,16 @@ PRIORITY_QUEUES = {
 request_counter = Counter(
     "priority_requests_total",
     "Total priority requests processed",
-    labelnames=["priority"]  # Changed from labels to labelnames
+    labelnames=["priority"]
 )
 
 request_latency = Histogram(
     "priority_request_latency_seconds",
     "Latency of priority requests",
-    labelnames=["priority"],  # Changed from labels to labelnames
+    labelnames=["priority"],
     buckets=(0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0)
 )
+
 
 # Want the minimum length to be at least 1, otherwise "" can be sent which breaks certain APIs.
 class Request(BaseModel):
@@ -72,6 +73,5 @@ def priority_post():
     # Track metrics
     request_counter.labels(priority=priority).inc()
     request_latency.labels(priority=priority).observe(time.time() - start_time)
-
 
     return redirect(url_for("index"))
