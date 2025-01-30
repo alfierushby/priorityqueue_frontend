@@ -2,7 +2,7 @@ import boto3
 from moto import mock_aws
 
 
-def general_priority_post(client,mock_env, priority):
+def general_priority_post(client, mock_env, priority):
     """Test posting a priority request with form data"""
 
     # Get the correct queue URL from Flask's test config
@@ -28,20 +28,21 @@ def general_priority_post(client,mock_env, priority):
     assert "Fix ASAP" in messages["Messages"][0]["Body"]
     assert priority in messages["Messages"][0]["Body"]
 
-def test_medium_priority_post(client, mock_env):
-    """Test posting a priority request with form data"""
 
-    general_priority_post(client,mock_env,"Medium")
+def test_medium_priority_post(client, mock_env):
+    """Test posting a medium priority request with form data"""
+    general_priority_post(client, mock_env, "Medium")
+
 
 def test_low_priority_post(client, mock_env):
-    """Test posting a priority request with form data"""
+    """Test posting a low priority request with form data"""
+    general_priority_post(client, mock_env, "Low")
 
-    general_priority_post(client,mock_env,"Low")
 
 def test_high_priority_post(client, mock_env):
-    """Test posting a priority request with form data"""
+    """Test posting a high priority request with form data"""
+    general_priority_post(client, mock_env, "High")
 
-    general_priority_post(client,mock_env,"High")
 
 def test_empty_string_description_post(client, mock_env):
     """Test a wrong post"""
