@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, request, jsonify
-from dotenv import load_dotenv
+from dotenv import load_dotenv, dotenv_values
 from prometheus_flask_exporter import PrometheusMetrics
 
 from routes import routes
@@ -18,6 +18,9 @@ def create_app(testing=False):
         "Medium": os.getenv("P2_QUEUE_URL"),
         "High": os.getenv("P3_QUEUE_URL")
     }
+    # Set all env variables to the config so no mix usage is done. Always use app.config!
+    config = dotenv_values()
+    app.config.from_mapping(config)
 
     metrics = PrometheusMetrics(app)
 

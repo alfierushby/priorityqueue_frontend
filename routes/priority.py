@@ -15,8 +15,16 @@ AWS_REGION = os.getenv('AWS_REGION')
 ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
 ACCESS_SECRET = os.getenv('AWS_SECRET_ACCESS_KEY')
 
-sqs_client = boto3.client('sqs', region_name=AWS_REGION, aws_access_key_id=ACCESS_KEY
-                          , aws_secret_access_key=ACCESS_SECRET)
+sqs_client = None
+
+def get_sqs_client():
+    """Dynamically create an SQS client using current_app.config"""
+    return sqs_client if sqs_client else boto3.client(
+        "sqs",
+        region_name=current_app.config["AWS_REGION"],
+        aws_access_key_id=current_app.config["AWS_ACCESS_KEY_ID"],
+        aws_secret_access_key=current_app.config["AWS_SECRET_ACCESS_KEY"]
+    )
 
 # Use the existing PrometheusMetrics instance in `app.py`
 request_counter = Counter(
@@ -60,10 +68,9 @@ def priority_post():
 
     message = Request(**external_data)
 
-    priority_queues = current_app.config["PRIORITY_QUEUES"]
-    queue_url = priority_queues[priority]
+    queue_url = current_app.config["PRIORITY_QUEUES"][priority]
 
-    sqs_client.send_message(QueueUrl=queue_url, MessageBody=message.model_dump_json())
+    get_sqs_client().send_message(QueueUrl=queue_url, MessageBody=message.model_dump_json())
 
     # Track metrics
     request_counter.labels(priority=priority).inc()
