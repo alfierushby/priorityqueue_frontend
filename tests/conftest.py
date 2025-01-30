@@ -1,7 +1,14 @@
+import os
+
 import boto3
 import pytest
+from dotenv import load_dotenv
 from moto import mock_aws
 from app import create_app
+
+load_dotenv()
+
+AWS_REGION = os.getenv('AWS_REGION')
 
 
 @pytest.fixture
@@ -18,14 +25,22 @@ def client(app):
 
 
 @pytest.fixture
-def mock_env(monkeypatch):
+def mock_env(app):
     """Mock AWS SQS and set environment variables for tests"""
     with mock_aws():
         # Set up the mock SQS service
-        sqs = boto3.client('sqs', region_name='eu-north-1')
-        queue_url = sqs.create_queue(QueueName='test-queue')['QueueUrl']
+        sqs = boto3.client('sqs', region_name=AWS_REGION)
 
-        # Mock the environment variable
-        monkeypatch.setenv('P1_QUEUE_URL', queue_url)
+        #  Create mock queues
+        low_queue = sqs.create_queue(QueueName="test-low")["QueueUrl"]
+        medium_queue = sqs.create_queue(QueueName="test-medium")["QueueUrl"]
+        high_queue = sqs.create_queue(QueueName="test-high")["QueueUrl"]
+
+        # Override app.config to use test queues
+        app.config["PRIORITY_QUEUES"] = {
+            "Low": low_queue,
+            "Medium": medium_queue,
+            "High": high_queue
+        }
 
         yield
