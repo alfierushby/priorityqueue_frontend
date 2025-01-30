@@ -53,9 +53,9 @@ def priority_post():
     """
     start_time = time.time()
 
-    title = request.form.get("title", "Default")
-    description = request.form.get("description", "Default Description")
-    priority = request.form.get("priority", "Unknown")
+    title = request.form.get("title")
+    description = request.form.get("description")
+    priority = request.form.get("priority")
 
     external_data = {
         "title": title,

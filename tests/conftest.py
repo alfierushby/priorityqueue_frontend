@@ -11,7 +11,7 @@ load_dotenv()
 @pytest.fixture
 def app():
     """Create and configure a new Flask app instance for testing"""
-    app = create_app(testing=True)
+    app = create_app()
     return app
 
 
@@ -39,5 +39,3 @@ def mock_env(app):
             "Medium": medium_queue,
             "High": high_queue
         }
-
-        yield

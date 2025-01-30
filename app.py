@@ -19,10 +19,9 @@ def create_sqs_client(config):
     )
 
 
-def create_app(testing=False):
+def create_app():
     """Application factory function for testing"""
     app = Flask(__name__)
-    app.config["TESTING"] = testing  # Enable testing mode if needed
 
     # Store queue URLs in `app.config` for global storage
     app.config["PRIORITY_QUEUES"] = {
@@ -55,4 +54,4 @@ def create_app(testing=False):
 
 
 if __name__ == '__main__':
-    create_app().run(debug=False)
+    create_app().run()
