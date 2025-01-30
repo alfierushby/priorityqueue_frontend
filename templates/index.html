@@ -19,8 +19,8 @@
 
 
             <!-- Errors will be displayed here -->
-            <div id="error-messages" class="alert alert-danger d-none">
-                <ul id="error-list"></ul>
+            <div id="error-messages" class="alert alert-danger d-none align-items-center">
+                <ul id="error-list" class="mb-0 w-100"></ul>
             </div>
 
             <form id="priority-form">
@@ -69,7 +69,9 @@
 
                     if (response && response.details) {
                         response.details.forEach(function (detail) {
-                            errorList.append(`<li>${detail.field[0]}: ${detail.message}</li>`);
+                                let fieldName = detail.field[0];
+                                fieldName = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);  // Capitalize first letter
+                                errorList.append(`<li><strong>${fieldName}</strong>: ${detail.message}</li>`);
                         });
                         errorMessages.removeClass('d-none');  // Show errors
                     }
