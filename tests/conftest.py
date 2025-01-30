@@ -8,9 +8,6 @@ from app import create_app
 
 load_dotenv()
 
-AWS_REGION = os.getenv('AWS_REGION')
-
-
 @pytest.fixture
 def app():
     """Create and configure a new Flask app instance for testing"""
@@ -29,7 +26,7 @@ def mock_env(app):
     """Mock AWS SQS and set environment variables for tests"""
     with mock_aws():
         # Set up the mock SQS service
-        sqs = boto3.client('sqs', region_name=AWS_REGION)
+        sqs = boto3.client('sqs', region_name=app.config["AWS_REGION"])
 
         #  Create mock queues
         low_queue = sqs.create_queue(QueueName="test-low")["QueueUrl"]

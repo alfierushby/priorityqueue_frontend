@@ -4,14 +4,14 @@ from moto import mock_aws
 import boto3
 
 @mock_aws
-def test_priority_post(client, mock_env):
+def test_medium_priority_post(client, mock_env):
     """Test posting a priority request with form data"""
 
     # Get the correct queue URL from Flask's test config
     queue_url = client.application.config["PRIORITY_QUEUES"]["Medium"]
 
     # Ensure we use the same region as in mock_env
-    sqs = boto3.client("sqs", region_name="eu-north-1")
+    sqs = boto3.client("sqs", region_name=client.application.config["AWS_REGION"])
 
     # Simulate form submission
     response = client.post("/api/priority/", data={
@@ -27,3 +27,4 @@ def test_priority_post(client, mock_env):
     assert "Messages" in messages
     assert len(messages["Messages"]) == 1
     assert "Urgent Issue" in messages["Messages"][0]["Body"]
+
