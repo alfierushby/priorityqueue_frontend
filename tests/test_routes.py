@@ -1,4 +1,6 @@
 import boto3
+from moto import mock_aws
+
 
 def test_priority_post(client, mock_env):
     """Test posting a priority request with form data"""

@@ -39,3 +39,5 @@ def mock_env(app):
             "Medium": medium_queue,
             "High": high_queue
         }
+
+        yield
