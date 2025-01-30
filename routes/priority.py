@@ -8,16 +8,20 @@ from pydantic import BaseModel, Field
 
 # Create a "Blueprint" or module
 priority_router = Blueprint('priority', __name__, url_prefix='/priority')
-sqs_client = None
+
+_sqs_client = None
 
 def get_sqs_client():
-    """Dynamically create an SQS client using current_app.config"""
-    return sqs_client if sqs_client else boto3.client(
-        "sqs",
-        region_name=current_app.config["AWS_REGION"],
-        aws_access_key_id=current_app.config["AWS_ACCESS_KEY_ID"],
-        aws_secret_access_key=current_app.config["AWS_SECRET_ACCESS_KEY"]
-    )
+    """Lazy-load and return the global SQS client"""
+    global _sqs_client
+    if _sqs_client is None:
+        _sqs_client = boto3.client(
+            "sqs",
+            region_name=current_app.config["AWS_REGION"],
+            aws_access_key_id=current_app.config["AWS_ACCESS_KEY_ID"],
+            aws_secret_access_key=current_app.config["AWS_SECRET_ACCESS_KEY"]
+        )
+    return _sqs_client  # Return cached instance
 
 # Use the existing PrometheusMetrics instance in `app.py`
 request_counter = Counter(

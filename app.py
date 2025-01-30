@@ -1,4 +1,6 @@
 import os
+
+import boto3
 from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv, dotenv_values
 from prometheus_flask_exporter import PrometheusMetrics
@@ -6,6 +8,16 @@ from prometheus_flask_exporter import PrometheusMetrics
 from routes import routes
 
 load_dotenv()
+
+def create_sqs_client(config):
+    """Initialize and return a single global SQS client using app.config"""
+    return boto3.client(
+        "sqs",
+        region_name=config["AWS_REGION"],
+        aws_access_key_id=config["AWS_ACCESS_KEY_ID"],
+        aws_secret_access_key=config["AWS_SECRET_ACCESS_KEY"]
+    )
+
 
 def create_app(testing=False):
     """Application factory function for testing"""
@@ -21,6 +33,9 @@ def create_app(testing=False):
     # Set all env variables to the config so no mix usage is done. Always use app.config!
     config = dotenv_values()
     app.config.from_mapping(config)
+
+    # Initialize and store the SQS client globally
+    app.config["SQS_CLIENT"] = create_sqs_client(app.config)
 
     metrics = PrometheusMetrics(app)
 
