@@ -3,7 +3,7 @@ import time
 
 import boto3
 from dotenv import load_dotenv
-from flask import Blueprint, request, render_template, abort, url_for, redirect
+from flask import Blueprint, request, render_template, abort, url_for, redirect, current_app
 from prometheus_flask_exporter import Counter, Histogram
 from pydantic import BaseModel, Field
 
@@ -17,12 +17,6 @@ ACCESS_SECRET = os.getenv('AWS_SECRET_ACCESS_KEY')
 
 sqs_client = boto3.client('sqs', region_name=AWS_REGION, aws_access_key_id=ACCESS_KEY
                           , aws_secret_access_key=ACCESS_SECRET)
-
-PRIORITY_QUEUES = {
-    "Low": os.getenv("P1_QUEUE_URL"),
-    "Medium": os.getenv("P2_QUEUE_URL"),
-    "High": os.getenv("P3_QUEUE_URL")
-}
 
 # Use the existing PrometheusMetrics instance in `app.py`
 request_counter = Counter(
@@ -54,6 +48,8 @@ def priority_post():
     """
     start_time = time.time()
 
+
+
     title = request.form.get("title", "Default")
     description = request.form.get("description", "Default Description")
     priority = request.form.get("priority", "Unknown")
@@ -66,7 +62,8 @@ def priority_post():
 
     message = Request(**external_data)
 
-    queue_url = PRIORITY_QUEUES[priority]
+    priority_queues = current_app.config["PRIORITY_QUEUES"]
+    queue_url = priority_queues[priority]
 
     sqs_client.send_message(QueueUrl=queue_url, MessageBody=message.model_dump_json())
 
