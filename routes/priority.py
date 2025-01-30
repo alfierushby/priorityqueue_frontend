@@ -2,19 +2,12 @@ import os
 import time
 
 import boto3
-from dotenv import load_dotenv
 from flask import Blueprint, request, render_template, abort, url_for, redirect, current_app
 from prometheus_flask_exporter import Counter, Histogram
 from pydantic import BaseModel, Field
 
-load_dotenv()
-
 # Create a "Blueprint" or module
 priority_router = Blueprint('priority', __name__, url_prefix='/priority')
-AWS_REGION = os.getenv('AWS_REGION')
-ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
-ACCESS_SECRET = os.getenv('AWS_SECRET_ACCESS_KEY')
-
 sqs_client = None
 
 def get_sqs_client():
