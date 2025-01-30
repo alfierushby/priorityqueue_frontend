@@ -2,8 +2,11 @@ import boto3
 from moto import mock_aws
 
 
-def general_priority_post(client, mock_env, priority):
-    """Test posting a priority request with form data"""
+def general_priority_post(client, priority):
+    """Test posting a priority request with form data
+    :param client: The client to interact with the app
+    :param priority: The priority of the issue to post (Low,Medium,High)
+    """
 
     # Get the correct queue URL from Flask's test config
     queue_url = client.application.config["PRIORITY_QUEUES"][priority]
@@ -29,23 +32,31 @@ def general_priority_post(client, mock_env, priority):
     assert priority in messages["Messages"][0]["Body"]
 
 
-def test_medium_priority_post(client, mock_env):
-    """Test posting a medium priority request with form data"""
-    general_priority_post(client, mock_env, "Medium")
+def test_medium_priority_post(client):
+    """Test posting a medium priority request with form data
+    :param client: The client to interact with the app
+    """
+    general_priority_post(client, "Medium")
 
 
-def test_low_priority_post(client, mock_env):
-    """Test posting a low priority request with form data"""
-    general_priority_post(client, mock_env, "Low")
+def test_low_priority_post(client):
+    """Test posting a low priority request with form data
+    :param client: The client to interact with the app
+    """
+    general_priority_post(client, "Low")
 
 
-def test_high_priority_post(client, mock_env):
-    """Test posting a high priority request with form data"""
-    general_priority_post(client, mock_env, "High")
+def test_high_priority_post(client):
+    """Test posting a high priority request with form data
+    :param client: The client to interact with the app
+    """
+    general_priority_post(client, "High")
 
 
-def test_empty_string_description_post(client, mock_env):
-    """Test a wrong post"""
+def test_empty_string_description_post(client):
+    """Test a post with an empty string description
+    :param client: The client to interact with the app
+    """
     # Simulate form submission
     response = client.post("/api/priority/", data={
         "title": "Urgent Issue",
@@ -65,8 +76,10 @@ def test_empty_string_description_post(client, mock_env):
     assert expected_error in error_data["details"]
 
 
-def test_null_description_post(client, mock_env):
-    """Test a wrong post"""
+def test_null_description_post(client):
+    """Test a post with a null description
+    :param client: The client to interact with the app
+    """
     # Simulate form submission
     response = client.post("/api/priority/", data={
         "title": "Urgent Issue",
@@ -85,11 +98,12 @@ def test_null_description_post(client, mock_env):
     assert expected_error in error_data["details"]
 
 
-def test_null_post(client, mock_env):
-    """Test a wrong post"""
+def test_null_post(client):
+    """Test a post with a null body
+    :param client: The client to interact with the app
+    """
     # Simulate form submission
-    response = client.post("/api/priority/", data={
-    }, content_type="application/x-www-form-urlencoded")
+    response = client.post("/api/priority/", content_type="application/x-www-form-urlencoded")
 
     assert response.status_code == 400
 

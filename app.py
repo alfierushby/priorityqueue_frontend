@@ -10,7 +10,10 @@ from routes import routes
 load_dotenv()
 
 def create_sqs_client(config):
-    """Initialize and return a single global SQS client using app.config"""
+    """Initialize and return a single global SQS client using app.config
+    :param config: The app config in the app context
+    :return: A boto3 client for sqs queries
+    """
     return boto3.client(
         "sqs",
         region_name=config["AWS_REGION"],

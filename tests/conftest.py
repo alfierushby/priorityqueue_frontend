@@ -10,20 +10,27 @@ load_dotenv()
 
 @pytest.fixture
 def app():
-    """Create and configure a new Flask app instance for testing"""
+    """Create and configure a new Flask app instance for testing
+    :return: app created
+    """
     app = create_app()
     return app
 
 
 @pytest.fixture
 def client(app):
-    """Create a test client for the Flask app"""
+    """Create a test client for the Flask app
+    :param app: The flask app
+    :return: The app with a test client created
+    """
     return app.test_client()
 
 
 @pytest.fixture
 def mock_env(app):
-    """Mock AWS SQS and set environment variables for tests"""
+    """Mock AWS SQS and set environment variables for tests
+    :param app: The flask app
+    """
     with mock_aws():
         # Set up the mock SQS service
         sqs = boto3.client('sqs', region_name=app.config["AWS_REGION"])
