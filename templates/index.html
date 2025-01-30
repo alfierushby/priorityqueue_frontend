@@ -12,34 +12,65 @@
   </head>
   <body>
     <div class="container h-100 d-flex justify-content-center align-items-center" style="min-height: 100vh">
-   <!-- your form container -->
         <div class="container w-50">
-            <form action="http://localhost:5000/api/priority" method="POST">
-                          <div class="form-group">
-                            <label for="title">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" value="Title" placeholder="Title">
-                          </div>
-                          <div class="form-group">
-                            <label for="priority">Select Priority</label>
-                            <select class="form-control" id="priority" name="priority">
-                              <option>Low</option>
-                              <option>Medium</option>
-                              <option>High</option>
-                            </select>
-                          </div>
-                          <div class="form-group" >
-                            <label for="description">Description</label>
-                            <textarea class="form-control" id="description" placeholder="description" name="description" rows="3"></textarea>
-                          </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
+            <!-- Errors will be displayed here -->
+            <div id="error-messages" class="alert alert-danger d-none">
+                <ul id="error-list"></ul>
             </div>
-       </div>
+
+            <form id="priority-form">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" class="form-control" id="title" name="title" value="Title" placeholder="Title">
+                </div>
+                <div class="form-group">
+                    <label for="priority">Select Priority</label>
+                    <select class="form-control" id="priority" name="priority">
+                        <option>Low</option>
+                        <option>Medium</option>
+                        <option>High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" id="description" placeholder="description" name="description" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
 
     <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#priority-form').submit(function (event) {
+            event.preventDefault();  // Stop the form from submitting normally
+
+            $.post('/api/priority', $(this).serialize())
+                .done(function (data) {
+                    // Success: Redirect
+                    window.location.href = "/";
+                })
+                .fail(function (data) {
+                    const response = data.responseJSON;  // Get JSON error response
+                    const errorMessages = $('#error-messages');
+                    const errorList = $('#error-list');
+                    errorList.empty();  // Clear existing errors
+
+                    if (response && response.details) {
+                        response.details.forEach(function (detail) {
+                            errorList.append(`<li>${detail.field[0]}: ${detail.message}</li>`);
+                        });
+                        errorMessages.removeClass('d-none');  // Show errors
+                    }
+                });
+        });
+    });
+</script>
   </body>
 </html>
