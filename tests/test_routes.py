@@ -68,3 +68,30 @@ def test_null_description_post(client, mock_env):
         "message": "Input should be a valid string"
     }
     assert expected_error in error_data["details"]
+
+
+def test_null_post(client, mock_env):
+    """Test a wrong post"""
+    # Simulate form submission
+    response = client.post("/api/priority/", data={
+    }, content_type="application/x-www-form-urlencoded")
+
+    assert response.status_code == 400
+
+    error_data = response.get_json()
+
+    assert error_data["error_type"] == "validation_error"
+    expected_errors = [{
+        "field": ["description"],
+        "message": "Input should be a valid string"
+    },
+        {
+            "field": ["title"],
+            "message": "Input should be a valid string"
+        },
+        {
+            "field": ["priority"],
+            "message": "Input should be a valid string"
+        }
+    ]
+    for expected_error in expected_errors: assert expected_error in error_data["details"]
