@@ -37,7 +37,6 @@ def create_app():
     app.config["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID")
     app.config["AWS_SECRET_ACCESS_KEY"] = os.getenv("AWS_SECRET_ACCESS_KEY")
 
-
     # Initialize and store the SQS client globally
     app.config["SQS_CLIENT"] = create_sqs_client(app.config)
 
