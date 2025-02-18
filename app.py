@@ -32,9 +32,11 @@ def create_app():
         "Medium": os.getenv("P2_QUEUE_URL"),
         "High": os.getenv("P3_QUEUE_URL")
     }
-    # Set all env variables to the config so no mix usage is done. Always use app.config!
-    config = dotenv_values()
-    app.config.from_mapping(config)
+    # Update app.config with needed keys directly from os.environ
+    app.config["AWS_REGION"] = os.getenv("AWS_REGION")
+    app.config["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID")
+    app.config["AWS_SECRET_ACCESS_KEY"] = os.getenv("AWS_SECRET_ACCESS_KEY")
+
 
     # Initialize and store the SQS client globally
     app.config["SQS_CLIENT"] = create_sqs_client(app.config)

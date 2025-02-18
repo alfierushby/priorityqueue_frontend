@@ -7,7 +7,6 @@ def general_priority_post(client, priority):
     :param client: The client to interact with the app
     :param priority: The priority of the issue to post (Low,Medium,High)
     """
-
     # Get the correct queue URL from Flask's test config
     queue_url = client.application.config["PRIORITY_QUEUES"][priority]
 

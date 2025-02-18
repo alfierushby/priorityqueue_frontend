@@ -67,7 +67,8 @@ def priority_post():
 
     queue_url = current_app.config["PRIORITY_QUEUES"][priority]
 
-    get_sqs_client().send_message(QueueUrl=queue_url, MessageBody=message.model_dump_json())
+    get_sqs_client().send_message(QueueUrl=queue_url,
+                                  MessageBody=message.model_dump_json())
 
     # Track metrics
     request_counter.labels(priority=priority).inc()
