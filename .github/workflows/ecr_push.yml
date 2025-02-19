@@ -18,7 +18,7 @@ on:
 
 
 jobs:
-  setup-aws:
+  push_to_ecr:
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS credentials

@@ -9,12 +9,12 @@ jobs:
    steps:
     - name: Check out code
       uses: actions/checkout@v4
-      
+
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag frontend:$(date +%s)
+      run: docker build . --file Dockerfile --tag image
 
     - name: Save Docker Image
-      run: docker save frontend:latest -o image.tar
+      run: docker save image -o image.tar
 
     - name: Upload image as artifact
       uses: actions/upload-artifact@v4
