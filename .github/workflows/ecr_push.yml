@@ -29,7 +29,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ inputs.account_id }}:role/${{ inputs.role_name }}
-          aws-region: eu-north-1
+          aws-region: us-east-1
       
       - name: Download Docker Artifact
         uses: actions/download-artifact@v4
