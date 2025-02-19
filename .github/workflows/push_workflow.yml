@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: CI/CD Pipeline
 
 on:
   push:
@@ -8,5 +8,14 @@ on:
 
 jobs:
 
-  build:
+  build-docker:
+    needs: configure-aws
     uses: alfierushby/priorityqueue_frontend/.github/workflows/docker_build.yml@main
+
+  push-to-ecr:
+    needs: build-docker
+    uses: alfierushby/priorityqueue_frontend/.github/workflows/ecr_push.yml@main
+    with:
+      account_id: "913524907347"
+      role_name: "ECR"
+      ecr_repo: "issuesystem/frontend"

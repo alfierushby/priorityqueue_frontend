@@ -1,0 +1,55 @@
+name: AWS ECR Push
+
+on:
+  workflow_call:
+    inputs:
+      account_id:
+        description: "AWS Account ID"
+        required: true
+        type: string
+      role_name:
+        description: "AWS IAM Role Name"
+        required: true
+        type: string
+      ecr_repo:
+        description: "Repo Name in ECR"
+        required: true
+        type: string
+
+
+jobs:
+  setup-aws:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ inputs.account_id }}:role/${{ inputs.role_name }}
+          aws-region: eu-north-1
+      
+      - name: Download Docker Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: image
+          path: .
+
+      - name: Load Docker Image
+        run: |
+          docker load -i image.tar
+      
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Tag and Push Docker Image to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ inputs.ecr_repo }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          IMAGE_NAME=$(docker images --format "{{.Repository}}" | head -n 1)
+          docker tag $IMAGE_NAME $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
