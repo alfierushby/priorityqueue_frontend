@@ -41,17 +41,17 @@ jobs:
         run: |
           docker load -i image.tar
       
-      - name: Login to Amazon ECR
+      - name: Login to Amazon ECR Public
         id: login-ecr-public
         uses: aws-actions/amazon-ecr-login@v2
         with:
-          registry_type: public
+          registry-type: public
 
-      - name: Tag and Push Docker Image to Amazon ECR
+      - name: Tag and Push Docker Image to Amazon ECR Public
         env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
           REPOSITORY: ${{ inputs.ecr_repo }}
-          REGISTRY_ALIAS: ${{ inputs.ecr_alias}}
+          REGISTRY_ALIAS: ${{ inputs.ecr_alias }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           IMAGE_NAME=$(docker images --format "{{.Repository}}" | head -n 1)
