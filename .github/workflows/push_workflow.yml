@@ -15,8 +15,12 @@ jobs:
   build-docker:
     uses: alfierushby/priorityqueue_frontend/.github/workflows/docker_build.yml@main
 
-  push-to-ecr:
+  trivy_scan:
     needs: build-docker
+    uses: alfierushby/trivy_sc/.github/workflows/trivy_scan.yml@main
+
+  push-to-ecr:
+    needs: trivy_scan
     uses: alfierushby/priorityqueue_frontend/.github/workflows/ecr_push.yml@main
     with:
       account_id: "913524907347"
