@@ -12,12 +12,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    env:
-      AWS_REGION: ${{ inputs.aws_region }}
-      P1_QUEUE_URL: "" 
-      P2_QUEUE_URL: ""
-      P3_QUEUE_URL: ""
-
     steps:
       - name: Check out code
         uses: actions/checkout@v4

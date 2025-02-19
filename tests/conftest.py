@@ -1,10 +1,10 @@
-import os
-
 import boto3
 import pytest
 from dotenv import load_dotenv
 from moto import mock_aws
 from app import create_app
+from containers import Container
+from tests import test_routes
 
 load_dotenv()
 
@@ -13,8 +13,31 @@ def app():
     """Create and configure a new Flask app instance for testing
     :return: app created
     """
-    app = create_app(sqs_client=mock_sqs_client) # Mock sqs client for testing
-    return app
+    with mock_aws():
+        sqs = boto3.client("sqs", region_name="eu-north-1")
+
+        #  Create mock queues
+        low_queue = sqs.create_queue(QueueName="test-low")["QueueUrl"]
+        medium_queue = sqs.create_queue(QueueName="test-medium")["QueueUrl"]
+        high_queue = sqs.create_queue(QueueName="test-high")["QueueUrl"]
+
+        # Set up container for testing
+        container = Container()
+
+        # Override SQS client with mock version
+        container.sqs_client.override(sqs)
+
+        # Override priority queues with test values
+        container.priority_queues.override({
+              "Low": low_queue,
+              "Medium": medium_queue,
+              "High": high_queue,
+         })
+
+        container.wire(modules=[test_routes])
+
+        app = create_app(container)
+        yield app
 
 
 @pytest.fixture
@@ -24,26 +47,3 @@ def client(app):
     :return: The app with a test client created
     """
     return app.test_client()
-
-@pytest.fixture
-def mock_sqs_client(app):
-    """Mock AWS SQS and set environment variables for tests
-    :param app: The flask app
-    """
-    with mock_aws():
-        # Set up the mock SQS service
-        sqs = boto3.client('sqs', region_name=app.config["AWS_REGION"])
-
-        #  Create mock queues
-        low_queue = sqs.create_queue(QueueName="test-low")["QueueUrl"]
-        medium_queue = sqs.create_queue(QueueName="test-medium")["QueueUrl"]
-        high_queue = sqs.create_queue(QueueName="test-high")["QueueUrl"]
-
-        # Override app.config to use test queues
-        app.config["PRIORITY_QUEUES"] = {
-            "Low": low_queue,
-            "Medium": medium_queue,
-            "High": high_queue
-        }
-
-        yield sqs

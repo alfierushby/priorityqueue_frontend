@@ -3,9 +3,9 @@ from pydantic import ValidationError
 
 from routes.priority import priority_router
 
-routes = Blueprint('api',__name__, url_prefix='/api')
+blueprint_routes = Blueprint('api',__name__, url_prefix='/api')
 
-@routes.errorhandler(500)
+@blueprint_routes.errorhandler(500)
 def handle_generic_error(error):
     return {
         "error": "Internal Server Error",
@@ -13,7 +13,7 @@ def handle_generic_error(error):
         "error_type": "internal_error"
     }, 500
 
-@routes.errorhandler(ValidationError)
+@blueprint_routes.errorhandler(ValidationError)
 def handle_validation_error(error):
     # Extract only user-friendly messages without exposing internal structure
     simplified_errors = [
@@ -29,7 +29,7 @@ def handle_validation_error(error):
         "details": simplified_errors  # Contains only high-level validation issues
     }, 400
 
-@routes.errorhandler(400)
+@blueprint_routes.errorhandler(400)
 def custom_error_400(msg):
     return {
         "error": "Error",
@@ -37,7 +37,7 @@ def custom_error_400(msg):
         "error_type": "internal_error"
     }, 400
 
-@routes.errorhandler(KeyError)
+@blueprint_routes.errorhandler(KeyError)
 def handle_key_error(error):
     return {
         "error": "Key Error",
@@ -45,7 +45,7 @@ def handle_key_error(error):
         "error_type": "internal_error"
     }, 400
 
-@routes.errorhandler(ValueError)
+@blueprint_routes.errorhandler(ValueError)
 def handle_value_error(error):
     if "list.remove(x)" in error.args[0]:
         return {
@@ -60,7 +60,7 @@ def handle_value_error(error):
             "error_type": "value_error"
         }, 400
 
-@routes.errorhandler(TypeError)
+@blueprint_routes.errorhandler(TypeError)
 def handle_type_error(error):
     return {
         "error": "Type Error",
@@ -68,6 +68,6 @@ def handle_type_error(error):
         "error_type": "internal_error"
     }, 400
 
-routes.register_blueprint(priority_router)
+blueprint_routes.register_blueprint(priority_router)
 
 

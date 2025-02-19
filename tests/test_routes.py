@@ -1,17 +1,22 @@
 import boto3
+from dependency_injector.wiring import inject, Provide
 from moto import mock_aws
 
+from containers import Container
 
-def general_priority_post(client, priority):
+
+@inject
+def general_priority_post(client, priority, priority_queues: dict = Provide[Container.priority_queues]):
     """Test posting a priority request with form data
+    :param priority_queues: Provided with dependency injection
     :param client: The client to interact with the app
     :param priority: The priority of the issue to post (Low,Medium,High)
     """
     # Get the correct queue URL from Flask's test config
-    queue_url = client.application.config["PRIORITY_QUEUES"][priority]
+    queue_url = priority_queues.get(priority)
 
     # Ensure we use the same region as in mock_env
-    sqs = boto3.client("sqs", region_name=client.application.config["AWS_REGION"])
+    sqs = boto3.client("sqs", region_name="eu-north-1")
 
     # Simulate form submission
     response = client.post("/api/priority/", data={
