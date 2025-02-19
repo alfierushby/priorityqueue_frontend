@@ -13,7 +13,7 @@ def app():
     """Create and configure a new Flask app instance for testing
     :return: app created
     """
-    app = create_app()
+    app = create_app(sqs_client=mock_sqs_client) # Mock sqs client for testing
     return app
 
 
@@ -25,9 +25,8 @@ def client(app):
     """
     return app.test_client()
 
-
 @pytest.fixture
-def mock_env(app):
+def mock_sqs_client(app):
     """Mock AWS SQS and set environment variables for tests
     :param app: The flask app
     """
@@ -47,4 +46,4 @@ def mock_env(app):
             "High": high_queue
         }
 
-        yield
+        yield sqs

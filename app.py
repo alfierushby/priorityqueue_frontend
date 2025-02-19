@@ -22,7 +22,7 @@ def create_sqs_client(config):
     )
 
 
-def create_app():
+def create_app(sqs_client=None):
     """Application factory function for testing"""
     app = Flask(__name__)
 
@@ -37,8 +37,11 @@ def create_app():
     app.config["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID")
     app.config["AWS_SECRET_ACCESS_KEY"] = os.getenv("AWS_SECRET_ACCESS_KEY")
 
-    # Initialize and store the SQS client globally
-    app.config["SQS_CLIENT"] = create_sqs_client(app.config)
+    # Allow injection of a custom SQS client, for testing
+    if sqs_client is None:
+        sqs_client = create_sqs_client(app.config)
+    
+    app.config["SQS_CLIENT"] = sqs_client
 
     metrics = PrometheusMetrics(app)
 
