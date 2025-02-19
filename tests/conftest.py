@@ -1,3 +1,5 @@
+import os
+
 import boto3
 import pytest
 from dotenv import load_dotenv
@@ -14,7 +16,7 @@ def app():
     :return: app created
     """
     with mock_aws():
-        sqs = boto3.client("sqs", region_name="eu-north-1")
+        sqs = boto3.client("sqs", region_name=os.getenv("AWS_REGION"))
 
         #  Create mock queues
         low_queue = sqs.create_queue(QueueName="test-low")["QueueUrl"]

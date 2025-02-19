@@ -1,3 +1,5 @@
+import os
+
 import boto3
 from dependency_injector.wiring import inject, Provide
 from moto import mock_aws
@@ -16,7 +18,7 @@ def general_priority_post(client, priority, priority_queues: dict = Provide[Cont
     queue_url = priority_queues.get(priority)
 
     # Ensure we use the same region as in mock_env
-    sqs = boto3.client("sqs", region_name="eu-north-1")
+    sqs = boto3.client("sqs", region_name=os.getenv("AWS_REGION"))
 
     # Simulate form submission
     response = client.post("/api/priority/", data={
