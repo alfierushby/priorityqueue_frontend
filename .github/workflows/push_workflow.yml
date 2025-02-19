@@ -12,6 +12,14 @@ permissions:
 
 jobs:
 
+  pytests:
+    uses: alfierushby/priorityqueue_frontend/.github/workflows/pytests.yml@main
+
+  sonarcloud-scan:
+    uses: alfierushby/priorityqueue_frontend/.github/workflows/sonar_scan.yml@main
+    secrets:
+      sonar_token: ${{ secrets.SONAR_TOKEN }}
+  
   build-docker:
     uses: alfierushby/priorityqueue_frontend/.github/workflows/docker_build.yml@main
 
@@ -19,14 +27,10 @@ jobs:
     needs: build-docker
     uses: alfierushby/priorityqueue_frontend/.github/workflows/trivy_scan.yml@main
 
-  sonarcloud-scan:
-    uses: alfierushby/priorityqueue_frontend/.github/workflows/sonar_scan.yml@main
-    secrets:
-      sonar_token: ${{ secrets.SONAR_TOKEN }}
-
   push-to-ecr:
     needs: 
       - trivy_scan
+      - pytests
       - sonarcloud-scan
     uses: alfierushby/priorityqueue_frontend/.github/workflows/ecr_push.yml@main
     with:
