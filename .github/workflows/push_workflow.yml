@@ -9,7 +9,6 @@ on:
 jobs:
 
   build-docker:
-    needs: configure-aws
     uses: alfierushby/priorityqueue_frontend/.github/workflows/docker_build.yml@main
 
   push-to-ecr:
