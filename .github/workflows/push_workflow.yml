@@ -20,13 +20,14 @@ jobs:
     uses: alfierushby/priorityqueue_frontend/.github/workflows/trivy_scan.yml@main
 
   sonarcloud-scan:
-    needs: build-docker
     uses: alfierushby/priorityqueue_frontend/.github/workflows/sonar_scan.yml@main
     secrets:
       sonar_token: ${{ secrets.SONAR_TOKEN }}
 
   push-to-ecr:
-    needs: trivy_scan
+    needs: 
+      - trivy_scan
+      - sonarcloud-scan
     uses: alfierushby/priorityqueue_frontend/.github/workflows/ecr_push.yml@main
     with:
       account_id: "913524907347"
