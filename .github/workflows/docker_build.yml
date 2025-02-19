@@ -1,0 +1,10 @@
+name: Docker Build
+
+jobs:
+ docker_build_job:
+   runs-on: ubuntu-latest
+   steps:
+     - name: Check out code
+       uses: actions/checkout@v4
+     - name: Build the Docker image
+       run: docker build . --file Dockerfile --tag frontend:$(date +%s)
