@@ -1,0 +1,20 @@
+name: SonarCloud Analysis
+
+on:
+  workflow_call:
+    secrets:
+      sonar_token:
+        description: "SonarCloud Token"
+        required: true
+
+jobs:
+  sonarcloud_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.sonar_token }}
