@@ -26,3 +26,4 @@ jobs:
       account_id: "913524907347"
       role_name: "ECR"
       ecr_repo: "issue_creator/frontend"
+      ecr_alias: "i8t8f9f7"
