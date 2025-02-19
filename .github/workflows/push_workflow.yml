@@ -17,7 +17,7 @@ jobs:
 
   trivy_scan:
     needs: build-docker
-    uses: alfierushby/trivy_sc/.github/workflows/trivy_scan.yml@main
+    uses: alfierushby/priorityqueue_frontend/.github/workflows/trivy_scan.yml@main
 
   push-to-ecr:
     needs: trivy_scan
