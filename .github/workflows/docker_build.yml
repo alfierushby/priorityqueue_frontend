@@ -1,5 +1,8 @@
 name: Docker Build
 
+on:
+  workflow_call:
+
 jobs:
  docker_build_job:
    runs-on: ubuntu-latest
