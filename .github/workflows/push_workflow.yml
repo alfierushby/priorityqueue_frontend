@@ -13,27 +13,27 @@ permissions:
 jobs:
 
   pytests:
-    uses: alfierushby/github_actions/workflows/pytests.yml@main
+    uses: alfierushby/github_actions/.github/workflows/pytests.yml@main
 
   sonarcloud-scan:
-    uses: alfierushby/github_actions/workflows/sonar_scan.yml@main
+    uses: alfierushby/github_actions/.github/workflows/sonar_scan.yml@main
     secrets:
       sonar_token: ${{ secrets.SONAR_TOKEN }}
   
   build-docker:
-    uses: alfierushby/github_actions/workflows/docker_build.yml@main
+    uses: alfierushby/github_actions/.github/workflows/docker_build.yml@main
 
   trivy_scan:
     needs: 
       - build-docker
-    uses: alfierushby/github_actions/workflows/trivy_scan.yml@main
+    uses: alfierushby/github_actions/.github/workflows/trivy_scan.yml@main
 
   push-to-ecr:
     needs: 
       - trivy_scan
       - pytests
       - sonarcloud-scan
-    uses: alfierushby/github_actions/workflows/ecr_push.yml@main
+    uses: alfierushby/github_actions/.github/workflows/ecr_push.yml@main
     with:
       account_id: "913524907347"
       role_name: "ECR"
