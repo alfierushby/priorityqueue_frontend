@@ -24,11 +24,12 @@ jobs:
     uses: alfierushby/priorityqueue_frontend/.github/workflows/docker_build.yml@main
 
   trivy_scan:
+    needs: 
+      - build-docker
     uses: alfierushby/priorityqueue_frontend/.github/workflows/trivy_scan.yml@main
 
   push-to-ecr:
     needs: 
-      - build-docker
       - trivy_scan
       - pytests
       - sonarcloud-scan
