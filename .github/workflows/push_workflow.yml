@@ -34,7 +34,7 @@ jobs:
       - pytests
       - sonarcloud-scan
     uses: alfierushby/github_actions/.github/workflows/ecr_push.yml@main
-    with:
+    secrets:
       account_id: ${{ secrets.ACCOUNT_ID }}
       role_name: ${{ secrets.ROLE_NAME }}
       ecr_repo: ${{ secrets.ECR_REPO }}
