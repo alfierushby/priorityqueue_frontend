@@ -24,3 +24,4 @@ class Container(containers.DeclarativeContainer):
         "Medium": os.getenv("P2_QUEUE_URL", "test-medium"),
         "High": os.getenv("P3_QUEUE_URL", "test-high"),
     })
+
