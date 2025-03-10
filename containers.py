@@ -13,6 +13,7 @@ class Container(containers.DeclarativeContainer):
     sqs_client = providers.Singleton(
         boto3.client,
         service_name="sqs",
+        region_name=config.aws_region,
     )
 
     # Queue URLs provider
