@@ -16,12 +16,6 @@ class Container(containers.DeclarativeContainer):
         region_name=config.aws_region,
     )
 
-    bedrock_client = providers.Singleton(
-        boto3.client,
-        service_name="bedrock-runtime",
-        region_name="us-east-1",
-    )
-
     # Queue URLs provider
     priority_queues = providers.Object({
         "Low": os.getenv("P1_QUEUE_URL", "test-low"),

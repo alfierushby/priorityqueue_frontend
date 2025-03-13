@@ -1,7 +1,5 @@
-import io
-import json
 import os
-from unittest.mock import MagicMock, Mock
+from unittest.mock import patch
 
 import boto3
 import pytest
@@ -13,48 +11,36 @@ from tests import test_routes
 
 load_dotenv()
 
-mock_body = Mock()
-mock_body.read.return_value = json.dumps({"results" : [{"outputText" : "Testing"}]})
-
-mock_response = {"body": mock_body}
-
-
 @pytest.fixture
 def app():
     """Create and configure a new Flask app instance for testing
     :return: app created
     """
     with mock_aws():
-            sqs = boto3.client("sqs", region_name=os.getenv("AWS_REGION"))
-            bedrock = boto3.client("bedrock-runtime", region_name=os.getenv("AWS_REGION"))
+        sqs = boto3.client("sqs", region_name=os.getenv("AWS_REGION"))
 
-            bedrock.invoke_model = MagicMock(return_value=mock_response)
+        #  Create mock queues
+        low_queue = sqs.create_queue(QueueName="test-low")["QueueUrl"]
+        medium_queue = sqs.create_queue(QueueName="test-medium")["QueueUrl"]
+        high_queue = sqs.create_queue(QueueName="test-high")["QueueUrl"]
 
-            #  Create mock queues
-            low_queue = sqs.create_queue(QueueName="test-low")["QueueUrl"]
-            medium_queue = sqs.create_queue(QueueName="test-medium")["QueueUrl"]
-            high_queue = sqs.create_queue(QueueName="test-high")["QueueUrl"]
+        # Set up container for testing
+        container = Container()
 
-            # Set up container for testing
-            container = Container()
+        # Override SQS client with mock version
+        container.sqs_client.override(sqs)
 
-            # Override SQS client with mock version
-            container.sqs_client.override(sqs)
+        # Override priority queues with test values
+        container.priority_queues.override({
+           "Low": low_queue,
+            "Medium": medium_queue,
+            "High": high_queue,
+        })
 
-            # Override bedrock client with mock version
-            container.bedrock_client.override(bedrock)
+        container.wire(modules=[test_routes])
 
-            # Override priority queues with test values
-            container.priority_queues.override({
-                  "Low": low_queue,
-                  "Medium": medium_queue,
-                  "High": high_queue,
-             })
-
-            container.wire(modules=[test_routes])
-
-            app = create_app(container)
-            yield app
+        app = create_app(container)
+        yield app
 
 
 @pytest.fixture

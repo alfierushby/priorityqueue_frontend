@@ -34,6 +34,7 @@ def general_priority_post(client, priority, priority_queues: dict = Provide[Cont
     assert "Messages" in messages
     assert len(messages["Messages"]) == 1
     assert "Urgent Issue" in messages["Messages"][0]["Body"]
+    assert "Fix ASAP" in messages["Messages"][0]["Body"]
     assert priority in messages["Messages"][0]["Body"]
 
 

@@ -42,7 +42,6 @@ class Request(BaseModel):
 @inject
 def priority_post(
     sqs_client: boto3.client = Provide[Container.sqs_client],
-    bedrock_client: boto3.client = Provide[Container.bedrock_client],
     priority_queues: dict = Provide[Container.priority_queues]
 ):
     """
@@ -61,22 +60,6 @@ def priority_post(
         "priority": priority
     }
     message = Request(**external_data)
-
-    # Make AI call
-    prompt = "Please makes suggestions on how to fix the issue below: \n" + description
-    native_request = {
-        "inputText": prompt,
-        "textGenerationConfig": {
-            "maxTokenCount": 512,
-            "temperature": 0.5,
-        },
-    }
-    ai_request = json.dumps(native_request)
-
-    response = bedrock_client.invoke_model(modelId=model_id, body=ai_request)
-
-    model_response = json.loads(response["body"].read())
-    message.description = message.description + "\nSuggested Fix:\n" + model_response["results"][0]["outputText"]
 
     gunicorn_logger.info(f"Message description: {message.description}")
 
