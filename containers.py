@@ -19,7 +19,7 @@ class Container(containers.DeclarativeContainer):
     bedrock_client = providers.Singleton(
         boto3.client,
         service_name="bedrock-runtime",
-        region_name=config.aws_region,
+        region_name="us-east-1",
     )
 
     # Queue URLs provider

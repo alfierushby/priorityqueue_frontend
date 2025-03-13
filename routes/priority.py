@@ -72,7 +72,9 @@ def priority_post(
         },
     }
     ai_request = json.dumps(native_request)
+
     response = bedrock_client.invoke_model(modelId=model_id, body=ai_request)
+
     model_response = json.loads(response["body"])
 
     message.description = message.description + "\nSuggested Fix:\n" + model_response["results"][0]["outputText"]
