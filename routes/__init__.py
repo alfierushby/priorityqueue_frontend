@@ -47,10 +47,10 @@ def handle_key_error(error):
     }, 400
 
 @blueprint_routes.errorhandler(ClientError)
-def handle_key_error(error):
+def handle_client_error(error):
     return {
-        "error": "Client Error",
-        "message": "Client Error on boto3",
+        "error": "Client boto3 Error",
+        "message": error.message,
         "error_type": "internal_error"
     }, 400
 
