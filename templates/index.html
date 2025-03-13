@@ -56,7 +56,7 @@
         $('#priority-form').submit(function (event) {
             event.preventDefault();  // Stop the form from submitting normally
 
-            $.post('api/priority', $(this).serialize())
+            $.post('/api/priority/', $(this).serialize())
                 .done(function (data) {
                     // Success: Redirect
                     window.location.href = "/";
