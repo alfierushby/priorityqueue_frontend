@@ -15,7 +15,7 @@ gunicorn_logger = logging.getLogger("gunicorn.error")
 
 # Create a "Blueprint" or module
 priority_router = Blueprint('priority', __name__, url_prefix='/priority')
-model_id = "amazon.titan-text-express-v1:0"
+model_id = "amazon.titan-text-express-v1"
 
 # Use the existing PrometheusMetrics instance in `app.py`
 request_counter = Counter(
