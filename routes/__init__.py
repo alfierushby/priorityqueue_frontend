@@ -50,7 +50,7 @@ def handle_key_error(error):
 def handle_client_error(error):
     return {
         "error": "Client boto3 Error",
-        "message": error,
+        "message": error.response,
         "error_type": "internal_error"
     }, 400
 
