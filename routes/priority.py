@@ -75,9 +75,9 @@ def priority_post(
 
     response = bedrock_client.invoke_model(modelId=model_id, body=ai_request)
 
-    model_response = json.loads(response["body"])
-
+    model_response = json.loads(response["body"].read())
     message.description = message.description + "\nSuggested Fix:\n" + model_response["results"][0]["outputText"]
+
     gunicorn_logger.info(f"Message description: {message.description}")
 
     queue_url = priority_queues.get(priority)

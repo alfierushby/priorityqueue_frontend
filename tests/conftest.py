@@ -1,6 +1,7 @@
+import io
 import json
 import os
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 
 import boto3
 import pytest
@@ -12,9 +13,10 @@ from tests import test_routes
 
 load_dotenv()
 
-mock_response ={
-    'body': json.dumps({"results" : [{"outputText" : "Testing"}]})
-}
+mock_body = Mock()
+mock_body.read.return_value = json.dumps({"results" : [{"outputText" : "Testing"}]})
+
+mock_response = {"body": mock_body}
 
 
 @pytest.fixture
