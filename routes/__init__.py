@@ -1,3 +1,4 @@
+from botocore.exceptions import ClientError
 from flask import Blueprint
 from pydantic import ValidationError
 
@@ -42,6 +43,14 @@ def handle_key_error(error):
     return {
         "error": "Key Error",
         "message": "Required key(s) do not exist in request",
+        "error_type": "internal_error"
+    }, 400
+
+@blueprint_routes.errorhandler(ClientError)
+def handle_key_error(error):
+    return {
+        "error": "Client Error",
+        "message": "Client Error on boto3",
         "error_type": "internal_error"
     }, 400
 

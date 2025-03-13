@@ -1,3 +1,5 @@
+import json
+import logging
 import os
 import time
 
@@ -9,8 +11,11 @@ from pydantic import BaseModel, Field
 
 from containers import Container
 
+gunicorn_logger = logging.getLogger("gunicorn.error")
+
 # Create a "Blueprint" or module
 priority_router = Blueprint('priority', __name__, url_prefix='/priority')
+model_id = "amazon.titan-text-express-v1:0"
 
 # Use the existing PrometheusMetrics instance in `app.py`
 request_counter = Counter(
@@ -37,6 +42,7 @@ class Request(BaseModel):
 @inject
 def priority_post(
     sqs_client: boto3.client = Provide[Container.sqs_client],
+    bedrock_client: boto3.client = Provide[Container.bedrock_client],
     priority_queues: dict = Provide[Container.priority_queues]
 ):
     """
@@ -54,8 +60,23 @@ def priority_post(
         "description": description,
         "priority": priority
     }
-
     message = Request(**external_data)
+
+    # Make AI call
+    prompt = "Please makes suggestions on how to fix the issue below: \n" + description
+    native_request = {
+        "inputText": prompt,
+        "textGenerationConfig": {
+            "maxTokenCount": 1024,
+            "temperature": 0.5,
+        },
+    }
+    ai_request = json.dumps(native_request)
+    response = bedrock_client.invoke_model(modelId=model_id, body=ai_request)
+    model_response = json.loads(response["body"])
+
+    message.description = message.description + "\nSuggested Fix:\n" + model_response["results"][0]["outputText"]
+    gunicorn_logger.info(f"Message description: {message.description}")
 
     queue_url = priority_queues.get(priority)
     sqs_client.send_message(QueueUrl=queue_url,MessageBody=message.model_dump_json())
